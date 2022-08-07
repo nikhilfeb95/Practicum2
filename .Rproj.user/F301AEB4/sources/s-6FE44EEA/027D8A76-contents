@@ -52,7 +52,7 @@ dbExecute(dbcon, "CREATE TABLE IF NOT EXISTS JOURNAL (
 
 dbExecute(dbcon, "CREATE TABLE IF NOT EXISTS ARTICLE (
           id INT AUTO_INCREMENT PRIMARY KEY,
-          forename VARCHAR(255),
+          journal_id INT,
           lastname VARCHAR(255),
           initials VARCHAR(255)")
 

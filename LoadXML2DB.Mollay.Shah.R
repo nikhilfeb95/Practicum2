@@ -3,24 +3,30 @@ library(RSQLite)
 library(DBI)
 path = "./"
 dbfileName = "publications.sqlite"
-dbcon <- dbConnect(RSQLite::SQLite(),paste0(path,dbfileName))
-#connecting first to the sqlite database.
 
+#connecting first to the sqlite database.
+dbcon <- dbConnect(RSQLite::SQLite(),paste0(path,dbfileName))
+
+
+#Drop the tables if they already exist
 dbExecute(dbcon, "DROP TABLE IF EXISTS Journal")
 dbExecute(dbcon, "DROP TABLE IF EXISTS PubDate")
 dbExecute(dbcon, "DROP TABLE IF EXISTS ISSN_TYPE")
 dbExecute(dbcon, "DROP TABLE IF EXISTS CITED_MEDIUM")
-dbExecute(dbcon, "DROP TABLE IF EXISTS Language")
 dbExecute(dbcon, "DROP TABLE IF EXISTS Article")
 dbExecute(dbcon, "DROP TABLE IF EXISTS Author")
 
-#Drop the tables if they already exist
-
-
-
 #Create all the required tables
 
+dbExecute(dbcon, "CREATE TABLE IF NOT EXISTS AUTHOR (
+          author_id INT AUTO_INCREMENT PRIMARY KEY,
+          forename VARCHAR(255),
+          lastname VARCHAR(255),
+          initials VARCHAR(255)
+) ")
 
+dbExecute(dbcon, "CREATE TABLE IF NOT EXISTS LANGUAGE(
+          )")
 
 
 

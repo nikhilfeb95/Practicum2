@@ -61,6 +61,10 @@ dbExecute(dbcon, "CREATE TABLE IF NOT EXISTS ARTICLE (
           )")
 
 
+parseDate <- function(day, year, month) {
+  
+}
+
 
 # Load the xml files.
 
@@ -71,9 +75,130 @@ xmlDOM <- xmlParse(xmlFile)
 r <- xmlRoot(xmlDOM)
 
 
-# parse the xml file.
+#define all the dataframes that we require to parse the data.
+Article.df <- data.frame (id = vector (mode = "character", 
+                                     length = numberOfBooks),
+                        author_id = vector (mode = "numeric", 
+                                            length = numberOfBooks),
+                        title = vector (mode = "character", 
+                                        length = numberOfBooks),
+                        edition = vector (mode = "integer", 
+                                          length = numberOfBooks),
+                        genre_id = vector (mode = "integer", 
+                                           length = numberOfBooks),
+                        price = vector (mode = "numeric", 
+                                        length = numberOfBooks),
+                        publish_date = vector (mode = "character", 
+                                               length = numberOfBooks),
+                        description = vector (mode = "character", 
+                                              length = numberOfBooks),
+                        stringsAsFactors = F)
 
+# parse the xml file.
+numberOfPubs <- xmlSize(r)Journal.df <- data.frame (id = vector (mode = "character", 
+                                     length = numberOfBooks),
+                        author_id = vector (mode = "numeric", 
+                                            length = numberOfBooks),
+                        title = vector (mode = "character", 
+                                        length = numberOfBooks),
+                        edition = vector (mode = "integer", 
+                                          length = numberOfBooks),
+                        genre_id = vector (mode = "integer", 
+                                           length = numberOfBooks),
+                        price = vector (mode = "numeric", 
+                                        length = numberOfBooks),
+                        publish_date = vector (mode = "character", 
+                                               length = numberOfBooks),
+                        description = vector (mode = "character", 
+                                              length = numberOfBooks),
+                        stringsAsFactors = F)
+
+Author.df <- data.frame (id = vector (mode = "character", 
+                                     length = numberOfBooks),
+                        author_id = vector (mode = "numeric", 
+                                            length = numberOfBooks),
+                        title = vector (mode = "character", 
+                                        length = numberOfBooks),
+                        edition = vector (mode = "integer", 
+                                          length = numberOfBooks),
+                        genre_id = vector (mode = "integer", 
+                                           length = numberOfBooks),
+                        price = vector (mode = "numeric", 
+                                        length = numberOfBooks),
+                        publish_date = vector (mode = "character", 
+                                               length = numberOfBooks),
+                        description = vector (mode = "character", 
+                                              length = numberOfBooks),
+                        stringsAsFactors = F)
+
+Language.df <- data.frame (id = vector (mode = "character", 
+                                     length = numberOfBooks),
+                        author_id = vector (mode = "numeric", 
+                                            length = numberOfBooks),
+                        title = vector (mode = "character", 
+                                        length = numberOfBooks),
+                        edition = vector (mode = "integer", 
+                                          length = numberOfBooks),
+                        genre_id = vector (mode = "integer", 
+                                           length = numberOfBooks),
+                        price = vector (mode = "numeric", 
+                                        length = numberOfBooks),
+                        publish_date = vector (mode = "character", 
+                                               length = numberOfBooks),
+                        description = vector (mode = "character", 
+                                              length = numberOfBooks),
+                        stringsAsFactors = F)
+
+issn_type.df <- data.frame (id = vector (mode = "character", 
+                                     length = numberOfBooks),
+                        author_id = vector (mode = "numeric", 
+                                            length = numberOfBooks),
+                        title = vector (mode = "character", 
+                                        length = numberOfBooks),
+                        edition = vector (mode = "integer", 
+                                          length = numberOfBooks),
+                        genre_id = vector (mode = "integer", 
+                                           length = numberOfBooks),
+                        price = vector (mode = "numeric", 
+                                        length = numberOfBooks),
+                        publish_date = vector (mode = "character", 
+                                               length = numberOfBooks),
+                        description = vector (mode = "character", 
+                                              length = numberOfBooks),
+                        stringsAsFactors = F)
+
+cited_meddium.df <- data.frame (id = vector (mode = "character", 
+                                     length = numberOfBooks),
+                        author_id = vector (mode = "numeric", 
+                                            length = numberOfBooks),
+                        title = vector (mode = "character", 
+                                        length = numberOfBooks),
+                        edition = vector (mode = "integer", 
+                                          length = numberOfBooks),
+                        genre_id = vector (mode = "integer", 
+                                           length = numberOfBooks),
+                        price = vector (mode = "numeric", 
+                                        length = numberOfBooks),
+                        publish_date = vector (mode = "character", 
+                                               length = numberOfBooks),
+                        description = vector (mode = "character", 
+                                              length = numberOfBooks),
+                        stringsAsFactors = F)
+
+# Parse the xml files here
+
+for(i in 1:numberOfPubs){
+  pubmed_article <- r[[i]]
+  
+  x <- xmlAttrs(pubmed_article)
+  article <- pubmed_article[[1]]
+  
+  #parse the journal from here
+  journal <- article[[1]]
+  print(journal)
+}
 
 
 #Load the data to the db.
 dbDisconnect(dbcon) 
+

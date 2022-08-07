@@ -46,21 +46,29 @@ dbExecute(dbcon, "CREATE TABLE IF NOT EXISTS JOURNAL (
           pubDate DATE,
           title VARCHAR(255),
           iso_abbreviation VARCHAR(255),
-          FOREIGN KEY (issn_type_id) REFERENCES issn_type(id),
-          FOREIGN KEY (cited_medium_id) REFERENCES cited_medium(id)
+          FOREIGN KEY issn_type_constraint(issn_type_id) REFERENCES issn_type(id),
+          FOREIGN KEY cited_medium_constraint (cited_medium_id) REFERENCES cited_medium(id)
 )")
 
 dbExecute(dbcon, "CREATE TABLE IF NOT EXISTS ARTICLE (
-          id INT AUTO_INCREMENT PRIMARY KEY,
           journal_id INT,
-          lastname VARCHAR(255),
-          initials VARCHAR(255)")
+          article_title VARCHAR(255),
+          language_id INT,
+          author_id INT,
+          FOREIGN KEY journal_constraint(journal_id) REFERENCES journal(issn),
+          FOREIGN KEY lang_constraint(language_id) REFERENCES language(lang_id),
+          FOREIGN KEY author_constraint(author_id) REFERENCES author(author_id)
+          )")
 
 
 
 # Load the xml files.
 
+library(XML)
+xmlFile <- "pubmed.xml"
+xmlDOM <- xmlParse(xmlFile)
 
+r <- xmlRoot(xmlDOM)
 
 
 # parse the xml file.

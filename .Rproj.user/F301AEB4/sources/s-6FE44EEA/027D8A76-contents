@@ -140,6 +140,12 @@ parse_attrs <- function(attrs){
   }
 }
 
+findLanguage <- function(lang){
+  query <- sprintf("Select id from Language where name=%s", language)
+  id <- dbGetQuery(dbcon, query)
+  
+  return(id)
+}
 
 # Load the xml files.
 
@@ -181,6 +187,16 @@ for(i in 1:numberOfPubs){
                    ,issn,issn_type,cited_medium,volume,pubDate,format,journal_title,iso_abbr,pubDate,format)
   
   #fetch info for the languages and the authors
+  language <- article[['Language']]
+  
+  
+  
+  #Insert into the language table if its new
+  if(is.null(findLanguage())){
+    
+  }
+  
+  article_title <- article[['ArticleTitle']] 
 }
 
 

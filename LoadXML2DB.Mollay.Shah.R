@@ -18,14 +18,14 @@ dbExecute(dbcon, "DROP TABLE IF EXISTS AUTHOR")
 #Create all the required tables
 
 dbExecute(dbcon, "CREATE TABLE IF NOT EXISTS AUTHOR (
-          author_id INT AUTO_INCREMENT PRIMARY KEY,
+          author_id INTEGER PRIMARY KEY AUTOINCREMENT,
           forename VARCHAR(255),
           lastname VARCHAR(255),
           initials VARCHAR(255)
 )")
 
 dbExecute(dbcon, "CREATE TABLE IF NOT EXISTS LANGUAGE(
-          lang_id INT AUTO_INCREMENT PRIMARY KEY,
+          lang_id INTEGER PRIMARY KEY AUTOINCREMENT,
           name VARCHAR(255))")
 
 dbExecute(dbcon, "CREATE TABLE IF NOT EXISTS JOURNAL (
@@ -39,11 +39,12 @@ dbExecute(dbcon, "CREATE TABLE IF NOT EXISTS JOURNAL (
 )")
 
 dbExecute(dbcon, "CREATE TABLE IF NOT EXISTS ARTICLE (
-          id INT PRIMARY KEY,
+          id INT,
           journal_id VARCHAR(255),
           article_title VARCHAR(255),
           language_id INT,
           author_id INT,
+          PRIMARY KEY (id, author_id),
           FOREIGN KEY (journal_id) REFERENCES journal(issn),
           FOREIGN KEY (language_id) REFERENCES language(lang_id),
           FOREIGN KEY (author_id) REFERENCES author(author_id)
@@ -51,7 +52,6 @@ dbExecute(dbcon, "CREATE TABLE IF NOT EXISTS ARTICLE (
 
 parseMonth <- function(month){
   numbericMonth <- "0"
-  print(month)
   switch(month, 
          Jan={
            numbericMonth <- "01"
@@ -134,16 +134,14 @@ parse_attrs <- function(attrs){
 findLanguage <- function(lang){
   query <- sprintf("Select lang_id from Language where name='%s'", lang)
   id <- dbGetQuery(dbcon, query)[1,'lang_id']
-  print(id)
   return(id)
 }
 
 findAuthor <- function(author){
-  foreName<-xmlValue(author [['ForeName']])
+  foreName<-xmlValue(author[['ForeName']])
   lastName<-xmlValue(author[['LastName']])
-  initials<-xmlValue(author['Initials'])
-  query <- sprintf("Select author_id from Author where forename='%s' AND lastname = '%s' AND intials='%s'", foreName, lastName, initials)
-  print(query)
+  initials<-xmlValue(author[['Initials']])
+  query <- sprintf("Select author_id from Author where forename LIKE '%s' AND lastname LIKE '%s' AND initials LIKE '%s'", foreName, lastName, initials)
   id <- dbGetQuery(dbcon, query)[1,'author_id']
   return(id)
 }
@@ -185,25 +183,22 @@ for(i in 1:numberOfPubs){
   journal_title <- xmlValue(journal[["Title"]])
 
   iso_abbr <- xmlValue(journal[["ISOAbbreviation"]])
-  print(iso_abbr)
   #Insert into the journals table
   query <- sprintf("INSERT INTO JOURNAL(issn, issn_type,cited_medium,volume, pubDate, title, isoabbreviation) values('%s','%s','%s', %d, '%s', '%s', '%s') On CONFLICT(issn) DO UPDATE SET pubDate='%s'"
                    ,issn,issn_type,cited_medium,volume,pubDate,journal_title,iso_abbr,pubDate)
-  print(query)
+
   dbExecute(dbcon, query)
   #fetch info for the languages and the authors
   language <- xmlValue(article[['Language']])
   
   lang_id <- findLanguage(language)
   #Insert into the language table if its new
-  if(is.null(lang_id)){
+  if(is.na(lang_id)){
     query <- sprintf("INSERT INTO LANGUAGE (name) values('%s')", language)
     dbExecute(dbcon, query)
     lang_id <- findLanguage(language)
   }
-  #convert to integer
-  lang_id <- strtoi(lang_id)
-  article_title <- article[['ArticleTitle']]
+  article_title <- xmlValue(article[['ArticleTitle']])
   
   #Insert into authors
   author_list <- article[['AuthorList']]
@@ -211,25 +206,30 @@ for(i in 1:numberOfPubs){
   author_size <- xmlSize(author_list)
   
   for(j in 1:author_size){
-    author <- author_list[[1]]
-    print(author)
+    author <- author_list[[j]]
     author_id <- findAuthor(author)
     
+    
     #Add to the author table first and then to the article
-    if(is.null(author_id)){
-      query <- sprintf("INSERT INTO AUTHOR(forename, lastname, initials) values('%s','%s','%s')")
+    if(is.na(author_id)){
+      foreName<-xmlValue(author[['ForeName']])
+      lastName<-xmlValue(author[['LastName']])
+      initials<-xmlValue(author[['Initials']])
+      query <- sprintf("INSERT INTO AUTHOR(forename, lastname, initials) values('%s','%s','%s')",foreName,lastName,initials)
       dbExecute(dbcon, query)
       author_id <- findAuthor(author)
     }
-    
     #insert into the article table now
-    query <- sprintf("INSERT INTO ARTICLE(id,journal_id, article_title, language_id, author_id) values(%d,'%s','%s',%d,%d)", 
+    query <- sprintf("INSERT INTO ARTICLE(id,journal_id, article_title, language_id, author_id) values(%d,'%s','%s', %d, %d)", 
                      article_id, issn,article_title,lang_id,author_id)
     dbExecute(dbcon, query)
   }
   article_id <- article_id + 1
 }
-
+print(dbGetQuery(dbcon,"Select * from Author"))
+print(dbGetQuery(dbcon,"Select * from Journal"))
+print(dbGetQuery(dbcon,"Select * from Article"))
+print(dbGetQuery(dbcon,"Select * from Language"))
 
 #Load the data to the db.
 dbDisconnect(dbcon) 

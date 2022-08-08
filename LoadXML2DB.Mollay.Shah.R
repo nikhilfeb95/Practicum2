@@ -33,7 +33,7 @@ dbExecute(dbcon, "CREATE TABLE IF NOT EXISTS JOURNAL (
           issn_type VARCHAR(255),
           cited_medium VARCHAR(255),
           volume INT,
-          pubDate DATE,
+          pubDate VARHCHAR(255),
           title VARCHAR(255),
           isoabbreviation VARCHAR(255)
 )")
@@ -132,16 +132,19 @@ parse_attrs <- function(attrs){
 }
 
 findLanguage <- function(lang){
-  query <- sprintf("Select lang_id from Language where name='%s'", language)
+  query <- sprintf("Select lang_id from Language where name='%s'", lang)
   id <- dbGetQuery(dbcon, query)[1,'lang_id']
   print(id)
   return(id)
 }
 
 findAuthor <- function(author){
-  query <- sprintf("Select author_id from Author where name='%s'", author)
+  foreName<-xmlValue(author [['ForeName']])
+  lastName<-xmlValue(author[['LastName']])
+  initials<-xmlValue(author['Initials'])
+  query <- sprintf("Select author_id from Author where forename='%s' AND lastname = '%s' AND intials='%s'", foreName, lastName, initials)
+  print(query)
   id <- dbGetQuery(dbcon, query)[1,'author_id']
-  print(id)
   return(id)
 }
 
@@ -175,20 +178,21 @@ for(i in 1:numberOfPubs){
   cited_medium <- parse_attrs(x)
   journal_issue <- journal[['JournalIssue']]
   
-  volume <- xmlValue(journal_issue[['Volume']])
+  volume <- strtoi(xmlValue(journal_issue[['Volume']]))
   issue <- xmlValue(journal_issue[['Issue']])
   
   pubDate <- parseDate(journal_issue[['PubDate']])
-  journal_title <- journal[["Title"]]
-  iso_abbr < - journal[["ISOAbbreviation"]]
-  format <- "%Y-%m-%d"
+  journal_title <- xmlValue(journal[["Title"]])
+
+  iso_abbr <- xmlValue(journal[["ISOAbbreviation"]])
+  print(iso_abbr)
   #Insert into the journals table
-  query <- sprintf("INSERT INTO journals (issn, issn_type,cited_medium,volume, pubDate, title, isoabbreviation) values('%s','%s',%s, %d,STR_TO_DATE('%s','%s'), %s, %s) On duplicate key update pubDate=STR_TO_DATE('%s','%s') "
-                   ,issn,issn_type,cited_medium,volume,pubDate,format,journal_title,iso_abbr,pubDate,format)
+  query <- sprintf("INSERT INTO JOURNAL(issn, issn_type,cited_medium,volume, pubDate, title, isoabbreviation) values('%s','%s','%s', %d, '%s', '%s', '%s') On CONFLICT(issn) DO UPDATE SET pubDate='%s'"
+                   ,issn,issn_type,cited_medium,volume,pubDate,journal_title,iso_abbr,pubDate)
+  print(query)
   dbExecute(dbcon, query)
   #fetch info for the languages and the authors
-  language <- article[['Language']]
-  
+  language <- xmlValue(article[['Language']])
   
   lang_id <- findLanguage(language)
   #Insert into the language table if its new
@@ -208,6 +212,7 @@ for(i in 1:numberOfPubs){
   
   for(j in 1:author_size){
     author <- author_list[[1]]
+    print(author)
     author_id <- findAuthor(author)
     
     #Add to the author table first and then to the article

@@ -103,7 +103,7 @@ parseDate <- function(pubDate) {
     day <- 1
   }
   else{
-    day <- pubDate[['Day']]
+    day <- xmlValue(pubDate[['Day']])
   }
   
   if(is.null(pubDate[['Month']])){
@@ -111,16 +111,16 @@ parseDate <- function(pubDate) {
     month <- 1
   }
   else{
-    month <- parseMonth(pubDate[['Month']])
+    month <- parseMonth(xmlValue(pubDate[['Month']]))
   }
   if(is.null(pubDate[['Year']])){
     #assume day to be first
     year <- 1901
   }
   else{
-    month <- pubDate[['Year']]
+    year <- xmlValue(pubDate[['Year']])
   }
-  formattedDate <- paste0(year,"-",month,"-",date)
+  formattedDate <- paste0(year,"-",month,"-",day)
   
   return(formattedDate)
 }
@@ -132,15 +132,15 @@ parse_attrs <- function(attrs){
 }
 
 findLanguage <- function(lang){
-  query <- sprintf("Select id from Language where name='%s'", language)
-  id <- dbGetQuery(dbcon, query)
+  query <- sprintf("Select lang_id from Language where name='%s'", language)
+  id <- dbGetQuery(dbcon, query)[1,'lang_id']
   print(id)
   return(id)
 }
 
 findAuthor <- function(author){
   query <- sprintf("Select author_id from Author where name='%s'", author)
-  id <- dbGetQuery(dbcon, query)
+  id <- dbGetQuery(dbcon, query)[1,'author_id']
   print(id)
   return(id)
 }
@@ -168,15 +168,15 @@ for(i in 1:numberOfPubs){
   
   journal <- article[[1]]
   
-  issn <- journal[['ISSN']]
+  issn <- xmlValue(journal[['ISSN']])
   x <- xmlAttrs(journal[[1]])
   issn_type <- parse_attrs(x)
   x <- xmlAttrs(journal[[2]])
   cited_medium <- parse_attrs(x)
   journal_issue <- journal[['JournalIssue']]
   
-  volume <- journal_issue[['Volume']]
-  issue <- journal_issue[['Issue']]
+  volume <- xmlValue(journal_issue[['Volume']])
+  issue <- xmlValue(journal_issue[['Issue']])
   
   pubDate <- parseDate(journal_issue[['PubDate']])
   journal_title <- journal[["Title"]]

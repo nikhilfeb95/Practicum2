@@ -1,12 +1,12 @@
 library(XML)
 library(RSQLite)
 library(DBI)
+library(stringr)
 path = "./"
 dbfileName = "publications.sqlite"
 
 #connecting first to the sqlite database.
 dbcon <- dbConnect(RSQLite::SQLite(),paste0(path,dbfileName))
-
 
 #Drop the tables if they already exist
 dbExecute(dbcon, "DROP TABLE IF EXISTS JOURNAL")
@@ -49,6 +49,13 @@ dbExecute(dbcon, "CREATE TABLE IF NOT EXISTS ARTICLE (
           FOREIGN KEY (language_id) REFERENCES language(lang_id),
           FOREIGN KEY (author_id) REFERENCES author(author_id)
           )")
+
+
+handleAphostrope <- function(str){
+  replaced <- str_replace_all(str, "'", "''")
+  return(replaced)
+}
+
 
 parseMonth <- function(month){
   numbericMonth <- "0"
@@ -138,9 +145,9 @@ findLanguage <- function(lang){
 }
 
 findAuthor <- function(author){
-  foreName<-xmlValue(author[['ForeName']])
-  lastName<-xmlValue(author[['LastName']])
-  initials<-xmlValue(author[['Initials']])
+  foreName<-handleAphostrope(xmlValue(author[['ForeName']]))
+  lastName<-handleAphostrope(xmlValue(author[['LastName']]))
+  initials<-handleAphostrope(xmlValue(author[['Initials']]))
   query <- sprintf("Select author_id from Author where forename LIKE '%s' AND lastname LIKE '%s' AND initials LIKE '%s'", foreName, lastName, initials)
   id <- dbGetQuery(dbcon, query)[1,'author_id']
   return(id)
@@ -149,7 +156,7 @@ findAuthor <- function(author){
 # Load the xml files.
 
 library(XML)
-xmlFile <- "pubmed.xml"
+xmlFile <- "pubmed22n0001-tf.xml"
 xmlDOM <- xmlParse(xmlFile)
 
 r <- xmlRoot(xmlDOM)
@@ -163,11 +170,11 @@ for(i in 1:numberOfPubs){
   pubmed_article <- r[[i]]
   
   
-  article <- pubmed_article[[1]]
+  article <- pubmed_article[["Article"]]
   
   #parse the journal from here
   
-  journal <- article[[1]]
+  journal <- article[["Journal"]]
   
   issn <- xmlValue(journal[['ISSN']])
   x <- xmlAttrs(journal[[1]])
@@ -180,9 +187,9 @@ for(i in 1:numberOfPubs){
   issue <- xmlValue(journal_issue[['Issue']])
   
   pubDate <- parseDate(journal_issue[['PubDate']])
-  journal_title <- xmlValue(journal[["Title"]])
+  journal_title <- handleAphostrope(xmlValue(journal[["Title"]]))
 
-  iso_abbr <- xmlValue(journal[["ISOAbbreviation"]])
+  iso_abbr <- handleAphostrope(xmlValue(journal[["ISOAbbreviation"]]))
   #Insert into the journals table
   query <- sprintf("INSERT INTO JOURNAL(issn, issn_type,cited_medium,volume, pubDate, title, isoabbreviation) values('%s','%s','%s', %d, '%s', '%s', '%s') On CONFLICT(issn) DO UPDATE SET pubDate='%s'"
                    ,issn,issn_type,cited_medium,volume,pubDate,journal_title,iso_abbr,pubDate)
@@ -198,7 +205,7 @@ for(i in 1:numberOfPubs){
     dbExecute(dbcon, query)
     lang_id <- findLanguage(language)
   }
-  article_title <- xmlValue(article[['ArticleTitle']])
+  article_title <- handleAphostrope(xmlValue(article[['ArticleTitle']]))
   
   #Insert into authors
   author_list <- article[['AuthorList']]
@@ -207,14 +214,17 @@ for(i in 1:numberOfPubs){
   
   for(j in 1:author_size){
     author <- author_list[[j]]
+    if(is.na(author)){
+      print(j)
+    }
     author_id <- findAuthor(author)
     
     
     #Add to the author table first and then to the article
     if(is.na(author_id)){
-      foreName<-xmlValue(author[['ForeName']])
-      lastName<-xmlValue(author[['LastName']])
-      initials<-xmlValue(author[['Initials']])
+      foreName<-handleAphostrope(xmlValue(author[['ForeName']]))
+      lastName<-handleAphostrope(xmlValue(author[['LastName']]))
+      initials<-handleAphostrope(xmlValue(author[['Initials']]))
       query <- sprintf("INSERT INTO AUTHOR(forename, lastname, initials) values('%s','%s','%s')",foreName,lastName,initials)
       dbExecute(dbcon, query)
       author_id <- findAuthor(author)

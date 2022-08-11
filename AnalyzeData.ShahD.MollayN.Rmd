@@ -1,0 +1,49 @@
+Load libraries
+
+```{r}
+library(RMySQL)
+```
+
+```{r}
+rm(list = ls())
+```
+
+# Connect to mysql database
+```{r}
+mySqlCon <- dbConnect(
+  RMySQL::MySQL(),
+  host='localhost',
+  port=3306,
+  user='root',
+  password='root@123')
+```
+
+```{r}
+dbExecute(mySqlCon, "SET GLOBAL local_infile = true")
+dbExecute(mySqlCon, "set global local_infile=true;")
+dbExecute(mySqlCon, "use Practicum;")
+```
+
+
+```{r}
+authorFactStmt <-paste0("SELECT ad.author_id, forename, lastname, number_of_articles ",
+                        "FROM AuthorFact af, AuthorDim ad where af.author_id = ad.author_id ",
+                       "order by number_of_articles desc LIMIT 10;");
+rsAuthorFact<-dbGetQuery(mySqlCon,authorFactStmt)
+print(rsAuthorFact)
+```
+
+```{r}
+journalFactStmt <-paste0("SELECT journal_title, per_year, CAST(sum(number_of_articles) as UNSIGNED) number_of_articles_per_year ",
+                          "FROM JournalFact jf, JournalDim jd where jf.journal_id = jd.journal_id ",
+                          "group by journal_title, per_year order by number_of_articles_per_year desc, journal_title desc LIMIT 1;"
+                        );
+rsJournalFact<-dbGetQuery(mySqlCon,journalFactStmt)
+print(rsJournalFact)
+```
+
+
+#Disconnect db
+```{r}
+dbDisconnect(mySqlCon) 
+```

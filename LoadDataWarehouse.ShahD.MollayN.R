@@ -129,7 +129,7 @@ authorFactDf <- dbFetch(authorFactRs)
 dbClearResult(authorFactRs)
 dbWriteTable(mySqlCon, "AuthorFact", authorFactDf, overwrite = FALSE, append = TRUE, row.names = FALSE)
 
-# Select data from Author fact table to verify the data. 
+# Select data from Author fact table to verify the data. Limit upto 5 to save execution time
 authorFactStmt <-paste0("SELECT af.author_id, forename, lastname, number_of_articles, number_of_co_authors ",
 "FROM AuthorFact af, AuthorDim ad where af.author_id= ad.author_id LIMIT 5;");
 rsAuthorFact<-dbGetQuery(mySqlCon,authorFactStmt)
@@ -165,7 +165,7 @@ journalFactDf <- dbFetch(journalFactRs)
 dbClearResult(journalFactRs)
 dbWriteTable(mySqlCon, "JournalFact", journalFactDf, overwrite = FALSE, append = TRUE, row.names = FALSE)
 
-# Select data from Author fact table to verify the data. 
+# Select data from Journal fact table to verify the data. This selects the number of articles by per quarter.
 journalFactStmt <-paste0("SELECT per_quarter,sum(number_of_articles) number_of_articles_per_quarter ",
                         "FROM JournalFact jf, JournalDim jd where jf.journal_id = jd.journal_id ",
                        "group by per_quarter LIMIT 5;");

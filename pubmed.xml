@@ -210,4 +210,68 @@
       </AuthorList>
     </Article>
   </PubmedArticle>
+  <PubmedArticle PMID="21">
+    <Article>
+      <Journal>
+        <ISSN IssnType="Print">0004-4172</ISSN>
+        <JournalIssue CitedMedium="Print">
+          <Volume>25</Volume>
+          <Issue>9</Issue>
+          <PubDate>
+            <Year>1975</Year>
+            <Month>Sep</Month>
+          </PubDate>
+        </JournalIssue>
+        <Title>Arzneimittel-Forschung</Title>
+        <ISOAbbreviation>Arzneimittelforschung</ISOAbbreviation>
+      </Journal>
+      <Language>ger</Language>
+      <ArticleTitle>[Biochemical studies on camomile components/III. In vitro studies about the antipeptic activity of (--)-alpha-bisabolol (author's transl)].</ArticleTitle>
+      <AuthorList CompleteYN="Y">
+        <Author ValidYN="Y">
+          <LastName>Isaac</LastName>
+          <ForeName>O</ForeName>
+          <Initials>O</Initials>
+        </Author>
+        <Author ValidYN="Y">
+          <LastName>Thiemer</LastName>
+          <ForeName>K</ForeName>
+          <Initials>K</Initials>
+        </Author>
+      </AuthorList>
+    </Article>
+  </PubmedArticle>
+    <PubmedArticle PMID="43">
+    <Article>
+      <Journal>
+        <ISSN IssnType="Print">0006-2960</ISSN>
+        <JournalIssue CitedMedium="Print">
+          <Volume>14</Volume>
+          <Issue>23</Issue>
+          <PubDate>
+            <Year>1975</Year>
+            <Month>Nov</Month>
+            <Day>18</Day>
+          </PubDate>
+        </JournalIssue>
+        <Title>Biochemistry</Title>
+        <ISOAbbreviation>Biochemistry</ISOAbbreviation>
+      </Journal>
+      <Language>eng</Language>
+      <ArticleTitle>Modification of arginine and lysine in proteins with 2,4-pentanedione.</ArticleTitle>
+      <AuthorList CompleteYN="Y">
+        <Author ValidYN="Y">
+          <LastName>Gilbert</LastName>
+          <ForeName>H F</ForeName>
+          <Initials>HF</Initials>
+          <Suffix>3rd</Suffix>
+        </Author>
+        <Author ValidYN="Y">
+          <LastName>O'Leary</LastName>
+          <ForeName>M H</ForeName>
+          <Initials>MH</Initials>
+        </Author>
+      </AuthorList>
+    </Article>
+  </PubmedArticle>
 </PubmedArticleSet>

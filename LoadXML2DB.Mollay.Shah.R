@@ -3,7 +3,7 @@ library(RSQLite)
 library(DBI)
 library(stringr)
 path = "./"
-dbfileName = "publications.sqlite"
+dbfileName = "publications2.sqlite"
 
 #connecting first to the sqlite database.
 dbcon <- dbConnect(RSQLite::SQLite(),paste0(path,dbfileName))
@@ -174,7 +174,7 @@ findAuthor <- function(author){
 # Load the xml files.
 
 library(XML)
-xmlFile <- "pubmed22n0001-tf.xml"
+xmlFile <- "pubmed.xml"
 xmlDOM <- xmlParse(xmlFile)
 
 r <- xmlRoot(xmlDOM)
@@ -182,11 +182,11 @@ r <- xmlRoot(xmlDOM)
 
 numberOfPubs <- xmlSize(r)
 
-article_id <- 1
+article_id <- 0
 # parse the xml file.
 for(i in 1:numberOfPubs){
   pubmed_article <- r[[i]]
-  
+  article_id <- strtoi(parse_attrs(xmlAttrs(pubmed_article)))
   if(is.na(pubmed_article)){
     next
   }

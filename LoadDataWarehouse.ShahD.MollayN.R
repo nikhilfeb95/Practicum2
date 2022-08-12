@@ -71,6 +71,7 @@ dbExecute(
 # Select the articles from sqlit3 DB and store in practicum.ArticleDim table of MySql DB
 articleRs <- dbSendQuery(dbcon,"Select id as article_id, journal_id, author_id, article_title from ARTICLE;")
 dfArticle <- dbFetch(articleRs)
+
 dbClearResult(articleRs)
 # Print author data frame
 dbWriteTable(mySqlCon, "ArticleDim", dfArticle, overwrite = FALSE, append = TRUE, row.names = FALSE)

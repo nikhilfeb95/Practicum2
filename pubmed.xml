@@ -274,4 +274,136 @@
       </AuthorList>
     </Article>
   </PubmedArticle>
+    <PubmedArticle PMID="439">
+    <Article>
+      <Journal>
+        <ISSN IssnType="Print">0368-2315</ISSN>
+        <JournalIssue CitedMedium="Print">
+          <Volume>4 SUPPL 2</Volume>
+          <PubDate>
+            <Year>1975</Year>
+          </PubDate>
+        </JournalIssue>
+        <Title>Journal de gynecologie, obstetrique et biologie de la reproduction</Title>
+        <ISOAbbreviation>J Gynecol Obstet Biol Reprod (Paris)</ISOAbbreviation>
+      </Journal>
+      <Language>fre</Language>
+      <ArticleTitle>[Use of isotopes in the diagnosis of malignant breast tumors].</ArticleTitle>
+      <AuthorList CompleteYN="Y">
+        <Author ValidYN="Y">
+          <LastName>Destailleur</LastName>
+          <ForeName>G</ForeName>
+          <Initials>G</Initials>
+        </Author>
+        <Author ValidYN="Y">
+          <LastName>Vernaillen</LastName>
+          <ForeName>P</ForeName>
+          <Initials>P</Initials>
+        </Author>
+        <Author ValidYN="Y">
+          <LastName>Pluygers</LastName>
+          <ForeName>E</ForeName>
+          <Initials>E</Initials>
+        </Author>
+      </AuthorList>
+    </Article>
+  </PubmedArticle>
+    <PubmedArticle PMID="747">
+    <Article>
+      <Journal>
+        <ISSN IssnType="Print">0034-5164</ISSN>
+        <JournalIssue CitedMedium="Print">
+          <Volume>12</Volume>
+          <Issue>3</Issue>
+          <PubDate>
+            <Year>1975</Year>
+            <Month>Nov</Month>
+          </PubDate>
+        </JournalIssue>
+        <Title>Research communications in chemical pathology and pharmacology</Title>
+        <ISOAbbreviation>Res Commun Chem Pathol Pharmacol</ISOAbbreviation>
+      </Journal>
+      <Language>eng</Language>
+      <ArticleTitle>Colorimetric determination of 5-aminosalicylic acid and its N-acetylated metabolite on urine and feces.</ArticleTitle>
+      <AuthorList CompleteYN="Y">
+        <Author ValidYN="Y">
+          <LastName>Pieniaszek</LastName>
+          <ForeName>H J</ForeName>
+          <Initials>HJ</Initials>
+          <Suffix>Jr</Suffix>
+        </Author>
+        <Author ValidYN="Y">
+          <LastName>BatesTR</LastName>
+        </Author>
+      </AuthorList>
+    </Article>
+  </PubmedArticle>
+  <PubmedArticle PMID="748">
+    <Article>
+      <Journal>
+        <ISSN IssnType="Print">0300-9130</ISSN>
+        <JournalIssue CitedMedium="Print">
+          <Volume>166</Volume>
+          <Issue>2</Issue>
+          <PubDate>
+            <Year>1975</Year>
+            <Month>Dec</Month>
+            <Day>11</Day>
+          </PubDate>
+        </JournalIssue>
+        <Title>Research in experimental medicine. Zeitschrift fur die gesamte experimentelle Medizin einschliesslich experimenteller Chirurgie</Title>
+        <ISOAbbreviation>Res Exp Med (Berl)</ISOAbbreviation>
+      </Journal>
+      <Language>ger</Language>
+      <ArticleTitle>[Pressures, blood gases, pH, lactate and pyruvate concentrations in the portal venous blood in patients after laparotomy during the first 9 days (author's transl)].</ArticleTitle>
+      <AuthorList CompleteYN="Y">
+        <Author ValidYN="Y">
+          <LastName>Eisele</LastName>
+          <ForeName>R</ForeName>
+          <Initials>R</Initials>
+        </Author>
+        <Author ValidYN="Y">
+          <LastName>Dissmann</LastName>
+          <ForeName>W</ForeName>
+          <Initials>W</Initials>
+        </Author>
+        <Author ValidYN="Y">
+          <LastName>Nasseri</LastName>
+          <ForeName>M</ForeName>
+          <Initials>M</Initials>
+        </Author>
+        <Author ValidYN="Y">
+          <LastName>Thimme</LastName>
+          <ForeName>W</ForeName>
+          <Initials>W</Initials>
+        </Author>
+      </AuthorList>
+    </Article>
+  </PubmedArticle>
+  <PubmedArticle PMID="3276">
+    <Article>
+      <Journal>
+        <ISSN IssnType="Print">0008-4166</ISSN>
+        <JournalIssue CitedMedium="Print">
+          <Volume>22</Volume>
+          <Issue>3</Issue>
+          <PubDate>
+            <Year>1976</Year>
+            <Month>Mar</Month>
+          </PubDate>
+        </JournalIssue>
+        <Title>Canadian journal of microbiology</Title>
+        <ISOAbbreviation>Can J Microbiol</ISOAbbreviation>
+      </Journal>
+      <Language>eng</Language>
+      <ArticleTitle>Zoospore chemotaxis in Australian isolates of Phytophthora species.</ArticleTitle>
+      <AuthorList CompleteYN="Y">
+        <Author ValidYN="Y">
+          <LastName>Halsall</LastName>
+          <ForeName>D M</ForeName>
+          <Initials>DM</Initials>
+        </Author>
+      </AuthorList>
+    </Article>
+  </PubmedArticle>
 </PubmedArticleSet>

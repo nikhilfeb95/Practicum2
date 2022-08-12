@@ -32,7 +32,7 @@ dbExecute(dbcon, "CREATE TABLE IF NOT EXISTS JOURNAL (
           issn VARCHAR(255) PRIMARY KEY,
           issn_type VARCHAR(255),
           cited_medium VARCHAR(255),
-          volume INT,
+          volume VARCHAR(255),
           pubDate VARHCHAR(255),
           title VARCHAR(255),
           isoabbreviation VARCHAR(255)
@@ -114,21 +114,20 @@ parseDate <- function(pubDate) {
   }
   
   if(is.null(pubDate[['Month']])){
-    #assume day to be first
+    #assume month to be first
     month <- 1
   }
   else{
     month <- parseMonth(xmlValue(pubDate[['Month']]))
   }
   if(is.null(pubDate[['Year']])){
-    #assume day to be first
+    #assume year to be first
     year <- 1901
   }
   else{
     year <- xmlValue(pubDate[['Year']])
   }
   formattedDate <- paste0(year,"-",month,"-",day)
-  
   return(formattedDate)
 }
 
@@ -145,9 +144,28 @@ findLanguage <- function(lang){
 }
 
 findAuthor <- function(author){
-  foreName<-handleAphostrope(xmlValue(author[['ForeName']]))
-  lastName<-handleAphostrope(xmlValue(author[['LastName']]))
-  initials<-handleAphostrope(xmlValue(author[['Initials']]))
+  
+  if(is.na(author[['ForeName']]) || is.null(author[['ForeName']])){
+    foreName <- ""
+  }
+  else{
+    foreName<-handleAphostrope(xmlValue(author[['ForeName']]))
+  }
+    
+  
+  if(is.na(author[['LastName']]) || is.null(author[['LastName']])) {
+    lastName <- ""
+  }
+  else{
+    lastName<-handleAphostrope(xmlValue(author[['LastName']]))
+  }
+    
+  if(is.na(author[['Initials']]) || is.null(author[['Initials']])) {
+    initials <- ""
+  }
+  else{
+    initials<-handleAphostrope(xmlValue(author[['Initials']]))
+  }
   query <- sprintf("Select author_id from Author where forename LIKE '%s' AND lastname LIKE '%s' AND initials LIKE '%s'", foreName, lastName, initials)
   id <- dbGetQuery(dbcon, query)[1,'author_id']
   return(id)
@@ -169,77 +187,155 @@ article_id <- 1
 for(i in 1:numberOfPubs){
   pubmed_article <- r[[i]]
   
+  if(is.na(pubmed_article)){
+    next
+  }
+    
   
   article <- pubmed_article[["Article"]]
   
+  if(is.na(article)){
+    next
+  }
   #parse the journal from here
   
   journal <- article[["Journal"]]
   
-  issn <- xmlValue(journal[['ISSN']])
-  x <- xmlAttrs(journal[[1]])
-  issn_type <- parse_attrs(x)
-  x <- xmlAttrs(journal[[2]])
-  cited_medium <- parse_attrs(x)
-  journal_issue <- journal[['JournalIssue']]
-  
-  volume <- strtoi(xmlValue(journal_issue[['Volume']]))
-  issue <- xmlValue(journal_issue[['Issue']])
-  
-  pubDate <- parseDate(journal_issue[['PubDate']])
-  journal_title <- handleAphostrope(xmlValue(journal[["Title"]]))
+  if(!is.na(journal)){
 
-  iso_abbr <- handleAphostrope(xmlValue(journal[["ISOAbbreviation"]]))
-  #Insert into the journals table
-  query <- sprintf("INSERT INTO JOURNAL(issn, issn_type,cited_medium,volume, pubDate, title, isoabbreviation) values('%s','%s','%s', %d, '%s', '%s', '%s') On CONFLICT(issn) DO UPDATE SET pubDate='%s'"
-                   ,issn,issn_type,cited_medium,volume,pubDate,journal_title,iso_abbr,pubDate)
+    if(is.null(journal[['ISSN']])){
+      issn <- paste("ISSN",article_id,sep = "-")
+    }
+    else{
+      issn <- xmlValue(journal[['ISSN']])
+    }
+    
+    if(is.null(xmlAttrs(journal[[2]]))){
+      x <- xmlAttrs(journal[[1]])
+      cited_medium <- parse_attrs(x)
+    }
+    else{
+      x <- xmlAttrs(journal[[1]])
+      issn_type <- parse_attrs(x)
+      x <- xmlAttrs(journal[[2]])
+      cited_medium <- parse_attrs(x)
+    }
+    
+    journal_issue <- journal[['JournalIssue']]
+    
+    volume <- ""
+    if(is.null(journal_issue[['Volume']]) || is.na(journal_issue[['Volume']])){
+      volume <- ""
+    }
+    else{
+      volume <- handleAphostrope(xmlValue(journal_issue[['Volume']]))
+    }
 
-  dbExecute(dbcon, query)
+    if(is.null(journal_issue[['Issue']]) || is.na(journal_issue[['Issue']])){
+      issue <- "" 
+    }
+    else{
+      issue <- xmlValue(journal_issue[['Issue']])  
+    }
+    
+    pubDate <- parseDate(journal_issue[['PubDate']])
+    if(is.null(journal[["Title"]]) || is.na(journal[["Title"]])){
+      journal_title <- "" 
+    }
+    else{
+      journal_title <- handleAphostrope(xmlValue(journal[["Title"]]))
+    }
+
+    if(is.na(journal[["ISOAbbreviation"]])){
+      iso_abbr <- "" 
+    }
+    else{
+      iso_abbr <- handleAphostrope(xmlValue(journal[["ISOAbbreviation"]]))
+    }
+    #Insert into the journals table
+    query <- sprintf("INSERT INTO JOURNAL(issn, issn_type,cited_medium,volume, pubDate, title, isoabbreviation) values('%s','%s','%s', '%s', '%s', '%s', '%s') On CONFLICT(issn) DO UPDATE SET pubDate='%s'"
+                     ,issn,issn_type,cited_medium,volume,pubDate,journal_title,iso_abbr,pubDate)
+    dbExecute(dbcon, query)
+  }
+  
   #fetch info for the languages and the authors
   language <- xmlValue(article[['Language']])
   
-  lang_id <- findLanguage(language)
-  #Insert into the language table if its new
-  if(is.na(lang_id)){
-    query <- sprintf("INSERT INTO LANGUAGE (name) values('%s')", language)
-    dbExecute(dbcon, query)
+  if(!is.na(language)){
     lang_id <- findLanguage(language)
+    #Insert into the language table if its new
+    if(is.na(lang_id)){
+      query <- sprintf("INSERT INTO LANGUAGE (name) values('%s')", language)
+      dbExecute(dbcon, query)
+      lang_id <- findLanguage(language)
+    }
   }
-  article_title <- handleAphostrope(xmlValue(article[['ArticleTitle']]))
+
+  if(is.null(article[['ArticleTitle']]) || is.na(article[['ArticleTitle']])){
+    article_title <- ""
+  }
+  else{
+    article_title <- handleAphostrope(xmlValue(article[['ArticleTitle']]))
+  }
   
   #Insert into authors
   author_list <- article[['AuthorList']]
-  
-  author_size <- xmlSize(author_list)
-  
-  for(j in 1:author_size){
-    author <- author_list[[j]]
-    if(is.na(author)){
-      print(j)
-    }
-    author_id <- findAuthor(author)
+  if(!is.null(author_list) && !is.na(author_list)){
+    author_size <- xmlSize(author_list)
     
-    
-    #Add to the author table first and then to the article
-    if(is.na(author_id)){
-      foreName<-handleAphostrope(xmlValue(author[['ForeName']]))
-      lastName<-handleAphostrope(xmlValue(author[['LastName']]))
-      initials<-handleAphostrope(xmlValue(author[['Initials']]))
-      query <- sprintf("INSERT INTO AUTHOR(forename, lastname, initials) values('%s','%s','%s')",foreName,lastName,initials)
-      dbExecute(dbcon, query)
+    for(j in 1:author_size){
+      author <- author_list[[j]]
+      if(is.na(author)){
+        next
+      }
       author_id <- findAuthor(author)
+      
+      
+      #Add to the author table first and then to the article
+      if(is.na(author_id) || is.null(author_id)){
+        
+        if(is.na(author[['ForeName']]) || is.null(author[['ForeName']])){
+          foreName <- ""
+        }
+        else{
+          foreName<-handleAphostrope(xmlValue(author[['ForeName']]))
+        }
+        
+        if(is.na(author[['LastName']]) ||is.null(author[['LastName']]) ){
+          lastName <- ""
+        }
+        else{
+          lastName<-handleAphostrope(xmlValue(author[['LastName']]))
+        }
+        if(is.na(author[['Initials']]) || is.null(author[['Initials']])){
+          initials <- ""
+        }
+        else{
+          initials<-handleAphostrope(xmlValue(author[['Initials']]))
+        }
+
+        query <- sprintf("INSERT INTO AUTHOR(forename, lastname, initials) values('%s','%s','%s')",foreName,lastName,initials)
+        dbExecute(dbcon, query)
+        author_id <- findAuthor(author)
+        
+      }
+      #check here for duplicate author ids
+      
+      #insert into the article table now
+      query <- sprintf("INSERT INTO ARTICLE(id,journal_id, article_title, language_id, author_id) values(%d,'%s','%s', %d, %d) ON CONFLICT(id,author_id) DO NOTHING", 
+                       article_id, issn,article_title,lang_id,author_id)
+        
+      dbExecute(dbcon, query)
     }
-    #insert into the article table now
-    query <- sprintf("INSERT INTO ARTICLE(id,journal_id, article_title, language_id, author_id) values(%d,'%s','%s', %d, %d)", 
-                     article_id, issn,article_title,lang_id,author_id)
-    dbExecute(dbcon, query)
   }
+  
+
   article_id <- article_id + 1
 }
-print(dbGetQuery(dbcon,"Select * from Author"))
-print(dbGetQuery(dbcon,"Select * from Journal"))
-print(dbGetQuery(dbcon,"Select * from Article"))
-print(dbGetQuery(dbcon,"Select * from Language"))
+#print(dbGetQuery(dbcon,"Select * from Author"))
+#print(dbGetQuery(dbcon,"Select * from Journal"))
+#print(dbGetQuery(dbcon,"Select * from Article"))
+#print(dbGetQuery(dbcon,"Select * from Language"))
 
 #Load the data to the db.
 dbDisconnect(dbcon) 
